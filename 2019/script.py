@@ -104,12 +104,34 @@ def Day3(data):
 	intersections, distanceOnWires = GetWireIntersections(data)
 	return min(intersections), min(distanceOnWires)
 
+def Day4(data):
+	_min, _max = [int(x) for x in data.split('-')]
+	part1, part2 = 0, 0
+	for i in range(_min, _max):
+		consecutive = {}
+		decrease = False
+		digits = [int(x) for x in str(i)]
+		for j in range(1, len(digits)):
+			if digits[j] == digits[j - 1]:
+				if digits[j] in consecutive:
+					consecutive[digits[j]] += 1
+				else:
+					consecutive[digits[j]] = 2
+			elif digits[j] < digits[j - 1]:
+				decrease = True
+				break
+		if len(consecutive) > 0 and not decrease:
+			part1 += 1
+			if min(consecutive.values()) == 2:
+				part2 += 1
+	return part1, part2
+
 def main(args):
 	data = LoadData()
 	
 	totalElapsed = 0
 	
-	for i in range(3):
+	for i in range(4):
 		totalElapsed += PrintDay(i + 1, data)
 	print('Total Elapsed ms: {}'.format(totalElapsed))
 
