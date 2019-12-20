@@ -81,12 +81,35 @@ def Day2(data):
 			break
 	return partOne[0], '{:02d}{:02d}'.format(i, j)
 
+def GetWireIntersections(data):
+	wires = []
+	directions = {'U':(0, 1), 'D':(0, -1), 'L':(-1, 0), 'R':(1, 0)}
+	for d in range(len(data)):
+		currentCoords = (0, 0)
+		wires.append({})
+		distanceTraveled = 0
+		for i in data[d]:
+			direction, magnitude = i[0], int(str(i[1:]))
+			for k in range(magnitude):
+				currentCoords = (currentCoords[0] + directions[direction][0], currentCoords[1] + directions[direction][1])
+				distanceTraveled += 1
+				wires[d][currentCoords] = distanceTraveled
+	intersections = [x for x in list(set(wires[0].keys()) & set(wires[1].keys()))]
+	manhattenDistance = [abs(x[0]) + abs(x[1]) for x in intersections]
+	distanceOnWires = [wires[0][x] + wires[1][x] for x in intersections]
+	return manhattenDistance, distanceOnWires
+
+def Day3(data):
+	data = [x.split(',') for x in data.splitlines()]
+	intersections, distanceOnWires = GetWireIntersections(data)
+	return min(intersections), min(distanceOnWires)
+
 def main(args):
 	data = LoadData()
 	
 	totalElapsed = 0
 	
-	for i in range(2):
+	for i in range(3):
 		totalElapsed += PrintDay(i + 1, data)
 	print('Total Elapsed ms: {}'.format(totalElapsed))
 
