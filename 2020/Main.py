@@ -1,6 +1,7 @@
 import	importlib,\
 		os,\
 		sys,\
+		time,\
 		\
 		CoreLib
 
@@ -15,12 +16,15 @@ def main(args):
 	# Determine which days were requested to test.
 	dayNumsToRun = args
 	if (len(dayNumsToRun) == 0):
-		dayNumsToRun = [i for i in range(1, 4)]
+		dayNumsToRun = [i for i in range(1, 5)]
 	days = [importDay(int(day)) for day in dayNumsToRun]
 
 	# Run the tests.
+	startTime = time.perf_counter_ns()
 	for day in days:
 		day.RunTests()
+	endTime = time.perf_counter_ns()
+	print('Total Elapsed: {0} ms'.format((endTime - startTime) / 1000000))
 
 if __name__ == '__main__':
 	fileDir = os.path.dirname(os.path.abspath(__file__))

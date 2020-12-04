@@ -1,9 +1,8 @@
 import CoreLib
 
 class PasswordPhilosophy(CoreLib.BasePuzzle):
-	def __init__(self, input, args):
-		super().__init__(input, args)
-		self.part = args[0]
+	def __init__(self):
+		super().__init__()
 
 	def ParseLine(self, line):
 		policy, password = line.split(': ')
@@ -21,12 +20,13 @@ class PasswordPhilosophy(CoreLib.BasePuzzle):
 		inPos2 = password[pos2] == policyChar
 		return inPos1 != inPos2
 
-	def Run(self):
-		if self.part == 1:
+	def Run(self, args):
+		part = args
+		if part == 1:
 			return len([password for policyMin, policyMax, policyChar, password in self.inputData if password.count(policyChar) in range(policyMin, policyMax + 1)])
-		elif self.part == 2:
+		elif part == 2:
 			return len([(policyMin, policyMax, policyChar, password) for policyMin, policyMax, policyChar, password in self.inputData if self.ValidCharPos(policyMin - 1, policyMax - 1, policyChar, password)])
 
 class Day2(CoreLib.BaseDay):
 	def __init__(self):
-		self.puzzles = [(PasswordPhilosophy, 0, [1]), (PasswordPhilosophy, 0, [2])]
+		self.puzzles = [(PasswordPhilosophy, 0, [1, 2])]
