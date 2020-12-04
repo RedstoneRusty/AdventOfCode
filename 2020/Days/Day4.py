@@ -15,34 +15,36 @@ class PassportProcessing(CoreLib.BasePuzzle):
 		return False
 
 	def IsValidHair(self, value):
-		if '#' in value:
-			validChars = [char for char in value.replace('#', '') if 'a' <= char <= 'f' or '0' <= char <= '9']
-			return len(validChars) == 6 == len(value) - 1
-		return False
+		return '#' == value[0] and len([char for char in value if 'a' <= char <= 'f' or '0' <= char <= '9']) == 6 == len(value) - 1
 
 	def IsValidPID(self, value):
 		validChars = [char for char in value if '0' <= char <= '9']
 		return len(validChars) == 9 == len(value)
 
 	def PassportContainsAllValidFields(self, passport):
-		mustContain = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
-		passportDict = dict(field.split(':') for field in passport.split(' ') if field != '')
-		hasAllFields = all(passportField in passportDict.keys() for passportField in mustContain)
+		for key, value in [passportField.split(':') for passportField in passport.split(' ') if passportField != '']:
+			if key in self.mustContain:
+				self.passportDict[key] = value
+		hasAllFields = '' not in self.passportDict.values()
 		if self.part == 1 or not hasAllFields:
 			return hasAllFields
-		valid = 1920 <= int(passportDict['byr']) <= 2002
-		valid &= 2010 <= int(passportDict['iyr']) <= 2020
-		valid &= 2020 <= int(passportDict['eyr']) <= 2030
-		valid &= self.IsValidHeight(passportDict['hgt'])
-		valid &= self.IsValidHair(passportDict['hcl'])
-		valid &= passportDict['ecl'] in ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']
-		valid &= self.IsValidPID(passportDict['pid'])
+		valid = 1920 <= int(self.passportDict['byr']) <= 2002
+		valid &= 2010 <= int(self.passportDict['iyr']) <= 2020
+		valid &= 2020 <= int(self.passportDict['eyr']) <= 2030
+		valid &= self.IsValidHeight(self.passportDict['hgt'])
+		valid &= self.IsValidHair(self.passportDict['hcl'])
+		valid &= self.passportDict['ecl'] in ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']
+		valid &= self.IsValidPID(self.passportDict['pid'])
 		return valid
 
 	def Run(self, args):
 		self.part = args
+		self.mustContain = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+		self.passportDict = {key: '' for key in self.mustContain}
 		validCount = 0
 		for passport in self.inputData:
+			for key in self.mustContain:
+				self.passportDict[key] = ''
 			if self.PassportContainsAllValidFields(passport):
 				validCount += 1
 		return validCount
