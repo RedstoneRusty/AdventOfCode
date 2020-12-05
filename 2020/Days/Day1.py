@@ -2,6 +2,7 @@ import	functools,\
 		itertools,\
 		more_itertools,\
 		operator,\
+		\
 		CoreLib
 
 class ReportRepair(CoreLib.BasePuzzle):

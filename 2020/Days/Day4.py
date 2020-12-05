@@ -6,6 +6,10 @@ class PassportProcessing(CoreLib.BasePuzzle):
 
 	def ParseInput(self, input):
 		self.inputData = [passport.replace('\n', ' ') for passport in CoreLib.InputEmptyLineSplit(input)]
+		self.mustContain = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+		self.passportDict = {key: '' for key in self.mustContain}
+		self.passportsWithAllFields = 0
+		self.passportsWithValidFields = 0
 
 	def IsValidHeight(self, value):
 		if 'cm' in value:
@@ -15,39 +19,43 @@ class PassportProcessing(CoreLib.BasePuzzle):
 		return False
 
 	def IsValidHair(self, value):
-		return '#' == value[0] and len([char for char in value if 'a' <= char <= 'f' or '0' <= char <= '9']) == 6 == len(value) - 1
+		try:
+			return value[0] == '#' and len(value[1:]) == 6 and int(value[1:], 16) > -1
+		except:
+			return False
 
 	def IsValidPID(self, value):
-		validChars = [char for char in value if '0' <= char <= '9']
-		return len(validChars) == 9 == len(value)
+		try:
+			return len(value) == 9 and int(value) > -1
+		except:
+			return False
 
-	def PassportContainsAllValidFields(self, passport):
+	def CheckPassportFields(self, passport):
 		for key, value in [passportField.split(':') for passportField in passport.split(' ') if passportField != '']:
 			if key in self.mustContain:
 				self.passportDict[key] = value
 		hasAllFields = '' not in self.passportDict.values()
-		if self.part == 1 or not hasAllFields:
-			return hasAllFields
-		valid = 1920 <= int(self.passportDict['byr']) <= 2002
-		valid &= 2010 <= int(self.passportDict['iyr']) <= 2020
-		valid &= 2020 <= int(self.passportDict['eyr']) <= 2030
-		valid &= self.IsValidHeight(self.passportDict['hgt'])
-		valid &= self.IsValidHair(self.passportDict['hcl'])
-		valid &= self.passportDict['ecl'] in ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']
-		valid &= self.IsValidPID(self.passportDict['pid'])
-		return valid
+		if not hasAllFields:
+			return
+		self.passportsWithAllFields += 1
+		if not 1920 <= int(self.passportDict['byr']) <= 2002: return
+		if not 2010 <= int(self.passportDict['iyr']) <= 2020: return
+		if not 2020 <= int(self.passportDict['eyr']) <= 2030: return
+		if not self.IsValidHeight(self.passportDict['hgt']): return
+		if not self.IsValidHair(self.passportDict['hcl']): return
+		if not self.passportDict['ecl'] in ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']: return
+		if not self.IsValidPID(self.passportDict['pid']): return
+		self.passportsWithValidFields += 1
 
 	def Run(self, args):
-		self.part = args
-		self.mustContain = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
-		self.passportDict = {key: '' for key in self.mustContain}
-		validCount = 0
-		for passport in self.inputData:
-			for key in self.mustContain:
-				self.passportDict[key] = ''
-			if self.PassportContainsAllValidFields(passport):
-				validCount += 1
-		return validCount
+		part = args
+		if part == 1:
+			for passport in self.inputData:
+				for key in self.mustContain:
+					self.passportDict[key] = ''
+				self.CheckPassportFields(passport)
+			return self.passportsWithAllFields
+		return self.passportsWithValidFields
 
 class Day4(CoreLib.BaseDay):
 	def __init__(self):

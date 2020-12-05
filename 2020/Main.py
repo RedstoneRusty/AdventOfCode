@@ -1,4 +1,5 @@
 import	importlib,\
+		importlib.util,\
 		os,\
 		sys,\
 		time,\
@@ -16,7 +17,7 @@ def main(args):
 	# Determine which days were requested to test.
 	dayNumsToRun = args
 	if (len(dayNumsToRun) == 0):
-		dayNumsToRun = [i for i in range(1, 5)]
+		dayNumsToRun = [i for i in range(1, 6)]
 	days = [importDay(int(day)) for day in dayNumsToRun]
 
 	# Run the tests.
