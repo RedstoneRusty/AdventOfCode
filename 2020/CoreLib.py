@@ -12,11 +12,11 @@ class BasePuzzle:
 		raise NotImplementedError('Puzzle {0} has not implemented a Run method'.format(type(self).__name__))
 
 class BaseDay:
-	def RunTests(self):
-		startAllTests = time.perf_counter_ns()
-		endIOTime = 0
+	def RunTests(self, numLoops):
+		avgMS = 0
 		for root, dirs, files in os.walk(os.path.abspath(os.getcwd() + '/Data/')):
 			dayStr = type(self).__name__
+			startIOTime = time.perf_counter_ns()
 			releventData = [ReadWholeFile(os.path.join(root, file)) for file in files if file == '{0}.txt'.format(dayStr) or '{0}_'.format(dayStr) in file]
 			endIOTime = time.perf_counter_ns()
 			print('{0}:'.format(dayStr))
@@ -30,17 +30,28 @@ class BaseDay:
 				instance.ParseInput(releventData[dataIndex])
 				endParseTime = time.perf_counter_ns()
 				for permutation in args:
-					startPuzzleRun = time.perf_counter_ns()
-					result = instance.Run(permutation)
+					results = set()
+					timingsMS = list()
+					for i in range(numLoops):
+						startPuzzleRun = time.perf_counter_ns()
+						results.add(instance.Run(permutation))
+						endPuzzleRun = time.perf_counter_ns()
+						timingsMS.append((endPuzzleRun - startPuzzleRun) / 1000000)
 					print('\tPart {0}:'.format(partNum))
-					print('\t\tAnswer: {0}'.format(result))
-					endPuzzleRun = time.perf_counter_ns()
-					print('\t\tSolve Time: {0} ms'.format((endPuzzleRun - startPuzzleRun) / 1000000))
+					for r in results:
+						print('\t\tAnswer: {0}'.format(r))
+					avgSolve = sum(timingsMS) / numLoops
+					print('\t\tSolve Time (min, avg, max): {0:.4f} ms, {1:.4f} ms, {2:.4f} ms'.format(min(timingsMS), avgSolve, max(timingsMS)))
+					avgMS += avgSolve
 					partNum += 1
-				print('\tData Parse Time: {0} ms'.format((endParseTime - startParseTime) / 1000000))
-		endAllTests = time.perf_counter_ns()
-		print('\tIO Time: {0} ms'.format((endIOTime - startAllTests) / 1000000))
-		print('\tTotal Elapsed: {0} ms'.format((endAllTests - startAllTests) / 1000000))
+				parseMS = (endParseTime - startParseTime) / 1000000
+				print('\tData Parse Time: {0:.4f} ms'.format(parseMS))
+				avgMS += parseMS
+			IOMS = (endIOTime - startIOTime) / 1000000
+			print('\tIO Time: {0:.4f} ms'.format(IOMS))
+			avgMS += IOMS
+			print('\tTotal Elapsed: {0:.4f} ms'.format(avgMS))
+			return avgMS
 
 # Utility Functions
 def InputLineSplit(input):

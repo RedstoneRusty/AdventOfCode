@@ -16,16 +16,17 @@ def importDay(dayNum):
 def main(args):
 	# Determine which days were requested to test.
 	dayNumsToRun = args
+	numLoops = 100
 	if (len(dayNumsToRun) == 0):
-		dayNumsToRun = [i for i in range(1, 6)]
+		dayNumsToRun = [i for i in range(1, 7)]
 	days = [importDay(int(day)) for day in dayNumsToRun]
 
 	# Run the tests.
-	startTime = time.perf_counter_ns()
+	print('Running all tests {0} times:'.format(numLoops))
+	avgTimeMS = 0
 	for day in days:
-		day.RunTests()
-	endTime = time.perf_counter_ns()
-	print('Total Elapsed: {0} ms'.format((endTime - startTime) / 1000000))
+		avgTimeMS += day.RunTests(numLoops)
+	print('Average Total Elapsed: {0:.4f} ms'.format(avgTimeMS))
 
 if __name__ == '__main__':
 	fileDir = os.path.dirname(os.path.abspath(__file__))

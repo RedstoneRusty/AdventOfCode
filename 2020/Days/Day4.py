@@ -5,11 +5,9 @@ class PassportProcessing(CoreLib.BasePuzzle):
 		super().__init__()
 
 	def ParseInput(self, input):
-		self.inputData = [passport.replace('\n', ' ') for passport in CoreLib.InputEmptyLineSplit(input)]
+		self.inputData = [passport.replace('\n', ' ').strip() for passport in CoreLib.InputEmptyLineSplit(input)]
 		self.mustContain = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
 		self.passportDict = {key: '' for key in self.mustContain}
-		self.passportsWithAllFields = 0
-		self.passportsWithValidFields = 0
 
 	def IsValidHeight(self, value):
 		if 'cm' in value:
@@ -31,7 +29,7 @@ class PassportProcessing(CoreLib.BasePuzzle):
 			return False
 
 	def CheckPassportFields(self, passport):
-		for key, value in [passportField.split(':') for passportField in passport.split(' ') if passportField != '']:
+		for key, value in [passportField.split(':') for passportField in passport.split(' ')]:
 			if key in self.mustContain:
 				self.passportDict[key] = value
 		hasAllFields = '' not in self.passportDict.values()
@@ -50,6 +48,8 @@ class PassportProcessing(CoreLib.BasePuzzle):
 	def Run(self, args):
 		part = args
 		if part == 1:
+			self.passportsWithAllFields = 0
+			self.passportsWithValidFields = 0
 			for passport in self.inputData:
 				for key in self.mustContain:
 					self.passportDict[key] = ''
