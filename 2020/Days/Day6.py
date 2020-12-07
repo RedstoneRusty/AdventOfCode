@@ -1,9 +1,4 @@
-import	math,\
-		\
-		CoreLib
-
-class BreakLoop(Exception):
-	pass
+import CoreLib
 
 class CustomCustoms(CoreLib.BasePuzzle):
 	def __init__(self):
