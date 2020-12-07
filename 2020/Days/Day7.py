@@ -1,4 +1,6 @@
-import CoreLib
+import	functools,\
+		\
+		CoreLib
 
 class HandyHaversacks(CoreLib.BasePuzzle):
 	def __init__(self):
@@ -14,10 +16,11 @@ class HandyHaversacks(CoreLib.BasePuzzle):
 				self.colorsFound.add(key)
 				self.FindTotalCouldContain(key)
 
-	def FindTotalBags(self, toCheck, multiplier):
-		self.totalBags += multiplier
+	def FindTotalBags(self, toCheck):
+		totalBags = 1
 		for amount, color in self.bagDict[toCheck]:
-			self.FindTotalBags(color, multiplier * amount)
+			totalBags += self.FindTotalBags(color) * amount
+		return totalBags
 
 	def Run(self, args):
 		part = args
@@ -26,9 +29,8 @@ class HandyHaversacks(CoreLib.BasePuzzle):
 			self.FindTotalCouldContain('shiny gold')
 			return len(self.colorsFound)
 		elif part == 2:
-			self.totalBags = 0
-			self.FindTotalBags('shiny gold', 1)
-			return self.totalBags - 1
+			self.FindTotalBags = functools.lru_cache()(self.FindTotalBags)
+			return self.FindTotalBags('shiny gold') - 1
 
 class Day7(CoreLib.BaseDay):
 	def __init__(self):
