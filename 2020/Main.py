@@ -18,7 +18,7 @@ def main(args):
 	dayNumsToRun = args
 	numLoops = 100
 	if (len(dayNumsToRun) == 0):
-		dayNumsToRun = [i for i in range(1, 10)]
+		dayNumsToRun = [i for i in range(1, 11)]
 	days = [importDay(int(day)) for day in dayNumsToRun]
 
 	# Run the tests.
